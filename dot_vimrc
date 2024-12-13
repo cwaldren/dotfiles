@@ -1,0 +1,11 @@
+let g:rustfmt_autosave = 1
+set number
+filetype plugin indent on
+set nocp
+syntax on
+set autowrite
+set hidden
+set backspace=indent,eol,start
+set rtp+=/usr/local/opt/fzf
+set grepprg=rg\ --vimgrep\ --smart-case\ --follow
+noremap <silent> - :Explore<CR>
