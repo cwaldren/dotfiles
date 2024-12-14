@@ -8,7 +8,7 @@ vim.o.wrap = false -- No linewrap
 vim.o.cursorline = true -- Highlight current line
 vim.o.termguicolors = true -- Enable 24bit RGB colors
 
-vim.cmd('syntax enable') -- Syntax highlighting
+-- vim.cmd('syntax enable') -- Syntax highlighting
 vim.cmd('filetype plugin indent on') -- 
 
 vim.opt.grepprg = 'rg --vimgrep --smart-case --follow' -- Use ripgrep
@@ -24,6 +24,8 @@ vim.api.nvim_set_keymap('n', '<Up>', '<NOP>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<Down>', '<NOP>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<Left>', '<NOP>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<Right>', '<NOP>', { noremap = true })
+
+vim.cmd('colorscheme dichromatic')
 
 local ensure_packer = function()
   local fn = vim.fn
@@ -42,6 +44,7 @@ return require('packer').startup(function(use)
     use 'tpope/vim-vinegar'
     use 'tpope/vim-projectionist'
     use 'tpope/vim-fugitive'
+    use 'romainl/vim-dichromatic'
     use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
     if packer_bootstrap then
         require('packer').sync()
