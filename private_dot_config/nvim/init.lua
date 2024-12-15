@@ -1,4 +1,6 @@
 vim.o.number = true -- Line numbers
+vim.g.mapleader = ' ' -- Space leader
+vim.g.maplocalleader = ' '
 vim.o.relativenumber = true -- So we can jump without math
 vim.o.tabstop = 4 -- How many spaces in tab
 vim.o.shiftwidth = 4 -- Indent
@@ -7,8 +9,13 @@ vim.o.smartindent = true -- Autoindent new lines
 vim.o.wrap = false -- No linewrap
 vim.o.cursorline = true -- Highlight current line
 vim.o.termguicolors = true -- Enable 24bit RGB colors
+vim.o.ignorecase = true -- case-insensitive search unless \C or >= 1 capitals in term
+vim.o.smartcase = true
+vim.o.inccommand = 'split'
+vim.schedule(function()
+    vim.opt.clipboard = 'unnamedplus'
+end)
 
--- vim.cmd('syntax enable') -- Syntax highlighting
 vim.cmd('filetype plugin indent on') -- 
 
 vim.opt.grepprg = 'rg --vimgrep --smart-case --follow' -- Use ripgrep
@@ -25,29 +32,53 @@ vim.api.nvim_set_keymap('n', '<Down>', '<NOP>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<Left>', '<NOP>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<Right>', '<NOP>', { noremap = true })
 
-vim.cmd('colorscheme dichromatic')
+-- Make it easier to change windows
+vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-local ensure_packer = function()
-  local fn = vim.fn
-  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-    vim.cmd [[packadd packer.nvim]]
-    return true
+
+vim.api.nvim_set_keymap('n', '<leader>nn', ':set relativenumber!<CR>', { noremap = true, silent = true })
+
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
   end
-  return false
 end
 
-local packer_bootstrap = ensure_packer()
-return require('packer').startup(function(use)
-    use 'wbthomason/packer.nvim'
-    use 'tpope/vim-vinegar'
-    use 'tpope/vim-projectionist'
-    use 'tpope/vim-fugitive'
-    use 'romainl/vim-dichromatic'
-    use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-    if packer_bootstrap then
-        require('packer').sync()
-    end
-end)
+--vim.keymap.set('n', '<c-P>', require('fzf-lua').files, { desc = "Fzf Files" })
+vim.opt.rtp:prepend(lazypath)
+require("lazy").setup({
+    spec = {
+        { 'romainl/vim-dichromatic',
+           lazy = false,
+           priority = 1000,
+           config = function()
+                vim.cmd([[colorscheme dichromatic]])
+            end,
+        },
+     {'tpope/vim-vinegar', event = "VeryLazy" },
+     {'tpope/vim-projectionist', lazy = true },
+     {'tpope/vim-fugitive', cmd = {"G", "Git"}},
+     {'neovim/nvim-lsp', lazy = true },
+     {'ibhagwan/fzf-lua', 
+        keys = {
+         { "<c-P>", function() require('fzf-lua').files() end, desc = "Fzf files"},
+        }
+     },
+     {'nvim-tree/nvim-web-devicons', lazy = true},
+    },
+    checker = { enabled = true },
+})
 
