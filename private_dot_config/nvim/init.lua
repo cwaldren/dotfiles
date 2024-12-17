@@ -89,6 +89,10 @@ require("lazy").setup({
 				})
 			end,
 		},
+		{ "pmizio/typescript-tools.nvim",
+			dependencies = {"nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+			opts = {},
+		},
 		{
 			"stevearc/conform.nvim",
 			event = { "BufWritePre" },
@@ -125,7 +129,7 @@ require("lazy").setup({
 			},
 		},
 		{ "nvim-tree/nvim-web-devicons", lazy = true },
-		{ "nvim-treesitter/playground" },
+		{ "nvim-treesitter/playground", cmd = "TSPlaygroundToggle" },
 		{
 			"nvim-treesitter/nvim-treesitter",
 			build = ":TSUpdate",
